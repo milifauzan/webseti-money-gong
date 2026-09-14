@@ -38,21 +38,40 @@ function getAuthHeaders(): HeadersInit {
   return headers;
 }
 
-export async function loginOwner(username: string, password: string):Promise<{ token: string; role: 'owner' }> {
-  const res = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  });
+export async function loginOwner(username: string, password: string): Promise<{ token: string; role: 'owner' }> {
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: String(username).trim(),
+        password: String(password).trim(),
+      }),
+    });
 
-  const json = await res.json();
-  if (!res.ok || !json.success) {
-    throw new Error(json.message || 'Username atau password salah.');
+    let json: any = null;
+    const contentType = res.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      json = await res.json();
+    } else {
+      const text = await res.text();
+      try {
+        json = JSON.parse(text);
+      } catch {
+        json = { success: false, message: `Respon server (${res.status}): Terjadi kendala jaringan atau server.` };
+      }
+    }
+
+    if (!res.ok || !json?.success) {
+      throw new Error(json?.message || 'Username atau password salah.');
+    }
+
+    setStoredToken(json.token);
+    setStoredRole('owner');
+    return { token: json.token, role: 'owner' };
+  } catch (err: any) {
+    throw new Error(err?.message || 'Gagal terhubung ke server. Periksa koneksi internet Anda.');
   }
-
-  setStoredToken(json.token);
-  setStoredRole('owner');
-  return { token: json.token, role: 'owner' };
 }
 
 export async function verifyAuth(): Promise<boolean> {

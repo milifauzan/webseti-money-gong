@@ -49,7 +49,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       onLoginSuccess();
     } catch (err: any) {
       setIsLoading(false);
-      setErrorMessage('Username atau password salah.');
+      setErrorMessage(err?.message || 'Username atau password salah.');
     }
   };
 

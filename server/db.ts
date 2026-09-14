@@ -254,11 +254,18 @@ class Database {
     const cleanUser = String(username).trim().toLowerCase();
     const ownerUser = (this.data.owner?.username || 'bau').trim().toLowerCase();
 
-    if (cleanUser === ownerUser) {
+    // Menerima 'bau' (atau 'dika' dari riwayat akun lama) agar dapat dibuka di perangkat dan akun mana pun
+    if (cleanUser === ownerUser || cleanUser === 'bau' || cleanUser === 'dika') {
+      const currentHash =
+        this.data.owner?.passwordHash &&
+        (this.data.owner.passwordHash.startsWith('$2a$') || this.data.owner.passwordHash.startsWith('$2b$'))
+          ? this.data.owner.passwordHash
+          : bcrypt.hashSync('2026', 10);
+
       return {
-        username: this.data.owner.username,
-        passwordHash: this.data.owner.passwordHash,
-        role: this.data.owner.role || 'owner',
+        username: this.data.owner?.username || 'bau',
+        passwordHash: currentHash,
+        role: this.data.owner?.role || 'owner',
       };
     }
     return null;
@@ -268,32 +275,39 @@ class Database {
    * 2. Melakukan pengecekan password menggunakan bcrypt.compare()
    */
   public async verifyPassword(plainPassword: string, storedHash: string): Promise<boolean> {
-    if (!plainPassword || !storedHash) return false;
+    if (!plainPassword) return false;
+    const cleanPass = String(plainPassword).trim();
 
     try {
       // Bandingkan password plain dengan hash bcrypt
-      const isMatch = await bcrypt.compare(plainPassword, storedHash);
-      if (isMatch) return true;
-    } catch (err) {
-      // Jika hash bukan format bcrypt (misal legacy PBKDF2)
-    }
-
-    // Fallback: cek format PBKDF2 legacy bila ada salt
-    if (this.data.owner?.salt) {
-      const computed = hashPassword(plainPassword, this.data.owner.salt);
-      if (computed === storedHash) {
-        // Upgrade otomatis ke bcrypt hash
-        this.data.owner.passwordHash = bcrypt.hashSync(plainPassword, 10);
-        this.save();
-        return true;
+      if (storedHash) {
+        const isMatch = await bcrypt.compare(cleanPass, storedHash);
+        if (isMatch) return true;
       }
+    } catch (err) {
+      // Abaikan jika hash bukan format bcrypt
     }
 
-    // Fallback jika password asli adalah '2026'
-    if (plainPassword.trim() === '2026') {
+    // Dukungan langsung untuk password yang ditentukan: '2026' atau 'amanah'
+    if (cleanPass === '2026' || cleanPass === 'amanah') {
+      if (!this.data.owner) {
+        this.data.owner = { username: 'bau', passwordHash: '', role: 'owner' };
+      }
+      this.data.owner.username = 'bau';
       this.data.owner.passwordHash = bcrypt.hashSync('2026', 10);
       this.save();
       return true;
+    }
+
+    // Fallback: cek format PBKDF2 legacy bila ada salt
+    if (this.data.owner?.salt && storedHash) {
+      const computed = hashPassword(cleanPass, this.data.owner.salt);
+      if (computed === storedHash) {
+        // Upgrade otomatis ke bcrypt hash
+        this.data.owner.passwordHash = bcrypt.hashSync(cleanPass, 10);
+        this.save();
+        return true;
+      }
     }
 
     return false;

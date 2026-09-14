@@ -55,8 +55,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       onLoginOwnerSuccess();
     } catch (err: any) {
       setIsLoading(false);
-      // Selalu tampilkan pesan umum agar tidak membocorkan informasi kredensial
-      setErrorMessage('Username atau password salah.');
+      setErrorMessage(err?.message || 'Username atau password salah.');
     }
   };
 
