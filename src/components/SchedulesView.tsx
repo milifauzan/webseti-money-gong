@@ -232,8 +232,8 @@ export const SchedulesView: React.FC<SchedulesViewProps> = ({
             </button>
           </div>
 
-          {/* Khusus Pemilik: Tambah Jadwal */}
-          {role === 'owner' && (
+          {/* Khusus Pemilik: Tambah Jadwal / Pengunjung: Mode Transparansi */}
+          {role === 'owner' ? (
             <button
               id="btn-tambah-jadwal"
               type="button"
@@ -243,6 +243,14 @@ export const SchedulesView: React.FC<SchedulesViewProps> = ({
               <PlusCircle className="w-4 h-4 text-[#84a98c]" />
               <span>➕ Buat Jadwal</span>
             </button>
+          ) : (
+            <div
+              id="badge-transparansi-jadwal-pengunjung"
+              className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#eeeae0] text-[#3d5a45] text-xs font-semibold border border-[#ded7c5] shadow-2xs"
+            >
+              <span>👁️</span>
+              <span>Mode Transparansi</span>
+            </div>
           )}
         </div>
       </div>

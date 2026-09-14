@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 
 interface ManageDataViewProps {
+  role?: UserRole;
   stats: DashboardStats;
   transactions: CashTransaction[];
   members: Member[];
@@ -18,6 +19,7 @@ interface ManageDataViewProps {
 }
 
 export const ManageDataView: React.FC<ManageDataViewProps> = ({
+  role = 'owner',
   stats,
   transactions,
   members,
@@ -40,15 +42,24 @@ export const ManageDataView: React.FC<ManageDataViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e3efe7] text-[#1b4332] text-xs font-bold uppercase tracking-wider mb-2 border border-[#bed8c7]">
-            <span>👑</span>
-            <span>Khusus Pemilik (Control Hub)</span>
-          </div>
+          {role === 'owner' ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e3efe7] text-[#1b4332] text-xs font-bold uppercase tracking-wider mb-2 border border-[#bed8c7]">
+              <span>👑</span>
+              <span>Khusus Pemilik (Control Hub)</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eeeae0] text-[#3d5a45] text-xs font-bold uppercase tracking-wider mb-2 border border-[#ded7c5]">
+              <span>👁️</span>
+              <span>Pusat Transparansi Data Sistem (Mode Pengunjung)</span>
+            </div>
+          )}
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1b4332] flex items-center gap-2 font-serif">
-            <span>⚙️</span> KELOLA DATA SISTEM
+            <span>⚙️</span> {role === 'owner' ? 'KELOLA DATA SISTEM' : 'PUSAT DATA & TRANSPARANSI'}
           </h1>
           <p className="text-xs sm:text-sm text-[#52796f] mt-1">
-            Pusat kendali dan status tabel database persisten (transaksi kas, anggota, dan jadwal kegiatan).
+            {role === 'owner'
+              ? 'Pusat kendali dan status tabel database persisten (transaksi kas, anggota, dan jadwal kegiatan).'
+              : 'Status integritas data dan arsitektur database persisten kelompok Money Gong yang dapat dipantau publik secara transparan.'}
           </p>
         </div>
 
@@ -60,7 +71,7 @@ export const ManageDataView: React.FC<ManageDataViewProps> = ({
           className="min-h-[42px] inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1b4332] hover:bg-[#143225] active:scale-[0.98] text-[#f7f5ed] font-bold text-xs shadow-xs transition-all self-start sm:self-center cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''} text-[#84a98c]`} />
-          <span>{isRefreshing ? 'Menyinkronkan...' : 'Sinkronkan Database'}</span>
+          <span>{isRefreshing ? 'Menyinkronkan...' : role === 'owner' ? 'Sinkronkan Database' : 'Perbarui Data'}</span>
         </button>
       </div>
 
@@ -122,7 +133,7 @@ export const ManageDataView: React.FC<ManageDataViewProps> = ({
             onClick={() => onNavigate('uang_kas')}
             className="w-full min-h-[42px] inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[#e4efe8] hover:bg-[#d5e7dc] text-[#1b4332] font-bold text-xs transition-colors cursor-pointer border border-[#bed8c7]"
           >
-            <span>Kelola Uang Kas</span>
+            <span>{role === 'owner' ? 'Kelola Uang Kas' : 'Lihat Data Uang Kas'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -165,7 +176,7 @@ export const ManageDataView: React.FC<ManageDataViewProps> = ({
             onClick={() => onNavigate('kenali_kami')}
             className="w-full min-h-[42px] inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[#e4efe8] hover:bg-[#d5e7dc] text-[#1b4332] font-bold text-xs transition-colors cursor-pointer border border-[#bed8c7]"
           >
-            <span>Kelola Anggota & Foto</span>
+            <span>{role === 'owner' ? 'Kelola Anggota & Foto' : 'Lihat Profil Anggota & Foto'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -208,7 +219,7 @@ export const ManageDataView: React.FC<ManageDataViewProps> = ({
             onClick={() => onNavigate('rencana_jadwal')}
             className="w-full min-h-[42px] inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[#e4efe8] hover:bg-[#d5e7dc] text-[#1b4332] font-bold text-xs transition-colors cursor-pointer border border-[#bed8c7]"
           >
-            <span>Kelola Rencana Jadwal</span>
+            <span>{role === 'owner' ? 'Kelola Rencana Jadwal' : 'Lihat Rencana Jadwal'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -258,7 +269,7 @@ export const ManageDataView: React.FC<ManageDataViewProps> = ({
             <thead className="bg-[#f7f5ed] border-b border-[#ded7c5] text-[#1b4332] font-bold uppercase tracking-wider">
               <tr>
                 <th className="py-3 px-4">Fitur Aplikasi</th>
-                <th className="py-3 px-4 text-center">👑 Pemilik (dika)</th>
+                <th className="py-3 px-4 text-center">👑 Pemilik</th>
                 <th className="py-3 px-4 text-center">👤 Pengunjung (Publik)</th>
                 <th className="py-3 px-4">Keterangan Keamanan</th>
               </tr>

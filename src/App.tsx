@@ -19,6 +19,7 @@ import { CashHistoryView } from './components/CashHistoryView';
 import { MembersView } from './components/MembersView';
 import { SchedulesView } from './components/SchedulesView';
 import { ManageDataView } from './components/ManageDataView';
+import { LoginModal } from './components/LoginModal';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { Loader2 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ export default function App() {
   const [role, setRole] = useState<UserRole | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>('beranda');
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Data states
   const [stats, setStats] = useState<DashboardStats>({
@@ -89,13 +91,12 @@ export default function App() {
         if (isValid) {
           setRole('owner');
         } else {
-          setStoredRole(null);
-          setRole(null);
+          setStoredRole('visitor');
+          setRole('visitor');
         }
-      } else if (storedRole === 'visitor') {
-        setRole('visitor');
       } else {
-        setRole(null);
+        // Mode Pengunjung aktif secara default saat dibuka di browser agar pengunjung langsung melihat seluruh isi website
+        setRole('visitor');
       }
 
       await loadAppData();
@@ -117,7 +118,6 @@ export default function App() {
   // User Actions
   const handleLoginOwnerSuccess = () => {
     setRole('owner');
-    setActiveTab('beranda');
     loadAppData();
     showToast('success', 'Selamat datang, Pemilik! Mode pengelolaan aktif.');
   };
@@ -132,9 +132,10 @@ export default function App() {
 
   const handleLogout = async () => {
     await logoutApi();
-    setRole(null);
+    setStoredRole('visitor');
+    setRole('visitor');
     setActiveTab('beranda');
-    showToast('info', 'Anda telah keluar. Silakan pilih peran.');
+    showToast('info', 'Anda beralih ke Mode Pengunjung (Hanya Lihat).');
   };
 
   const handleTransactionCreated = (newTx: CashTransaction, summary: any) => {
@@ -190,7 +191,32 @@ export default function App() {
           activeTab={activeTab}
           onSelectTab={setActiveTab}
           onLogout={handleLogout}
+          onOpenLogin={() => setIsLoginModalOpen(true)}
         />
+
+        {/* Visitor Top Notice Bar */}
+        {role === 'visitor' && (
+          <div
+            id="visitor-top-notice-bar"
+            className="bg-[#e9efe8] border-b border-[#cbd8ce] px-4 sm:px-6 py-2.5 text-xs text-[#203a27] flex flex-wrap items-center justify-between gap-3 font-medium"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm">👁️</span>
+              <span>
+                <strong className="font-bold text-[#1b4332]">Mode Transparansi Pengunjung:</strong>{' '}
+                Semua uang kas, mutasi, profil anggota, dan jadwal terbuka untuk dilihat. Penambahan data dikunci khusus untuk akun Pemilik.
+              </span>
+            </div>
+            <button
+              type="button"
+              id="btn-banner-login-owner"
+              onClick={() => setIsLoginModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold text-[#1b4332] bg-[#fdfcf9] hover:bg-white border border-[#bed8c7] shadow-2xs transition-colors cursor-pointer shrink-0"
+            >
+              <span>👑 Login Pemilik</span>
+            </button>
+          </div>
+        )}
 
         {/* Main Content Area */}
         <main className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-10">
@@ -244,8 +270,9 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'kelola_data' && role === 'owner' && (
+          {activeTab === 'kelola_data' && (
             <ManageDataView
+              role={role}
               stats={stats}
               transactions={transactions}
               members={members}
@@ -265,12 +292,28 @@ export default function App() {
             <span>—</span>
             <span>Kelola Kas, Kenali Kami, dan Rencanakan Kegiatan.</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap justify-center">
             <span>Status: <span className="font-semibold text-[#1b4332]">● Database Online</span></span>
-            <span>Peran: <span className="font-semibold text-[#1b4332]">{role === 'owner' ? '👑 Pemilik' : '👤 Pengunjung'}</span></span>
+            <span>Peran: <span className="font-semibold text-[#1b4332]">{role === 'owner' ? '👑 Pemilik' : '👤 Pengunjung (Lihat Saja)'}</span></span>
+            {role === 'visitor' && (
+              <button
+                type="button"
+                onClick={() => setIsLoginModalOpen(true)}
+                className="font-bold text-[#1b4332] underline hover:text-[#0f241a] cursor-pointer"
+              >
+                👑 Login Pemilik
+              </button>
+            )}
           </div>
         </div>
       </footer>
+
+      {/* Owner Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginOwnerSuccess}
+      />
 
       {/* Toast Notification Container */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />

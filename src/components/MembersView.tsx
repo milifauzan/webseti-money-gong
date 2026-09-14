@@ -212,8 +212,12 @@ export const MembersView: React.FC<MembersViewProps> = ({
             <span>➕ Tambah Anggota</span>
           </button>
         ) : (
-          <div className="text-xs font-semibold text-[#3d5a45] bg-[#eeeae0] px-3 py-1.5 rounded-full border border-[#ded7c5] self-start sm:self-center">
-            {members.length} Anggota Terdaftar
+          <div
+            id="badge-transparansi-anggota-pengunjung"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#3d5a45] bg-[#eeeae0] px-3.5 py-2 rounded-xl border border-[#ded7c5] self-start sm:self-center shadow-2xs"
+          >
+            <span>👁️</span>
+            <span>{members.length} Anggota Terdaftar (Mode Transparansi)</span>
           </div>
         )}
       </div>

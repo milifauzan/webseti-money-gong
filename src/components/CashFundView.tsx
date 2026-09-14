@@ -144,8 +144,8 @@ export const CashFundView: React.FC<CashFundViewProps> = ({
           </p>
         </div>
 
-        {/* Khusus Pemilik: Action Buttons */}
-        {role === 'owner' && (
+        {/* Khusus Pemilik: Action Buttons / Visitor: Transparency Badge */}
+        {role === 'owner' ? (
           <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
             <button
               id="btn-open-tambah-kas"
@@ -166,6 +166,14 @@ export const CashFundView: React.FC<CashFundViewProps> = ({
               <MinusCircle className="w-4 h-4 text-[#e0a6a6]" />
               <span>➖ Kurangi Kas</span>
             </button>
+          </div>
+        ) : (
+          <div
+            id="badge-transparansi-kas-pengunjung"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#eeeae0] text-[#3d5a45] text-xs font-semibold border border-[#ded7c5] self-start sm:self-center shadow-2xs"
+          >
+            <span>👁️</span>
+            <span>Mode Transparansi (Penambahan kas hanya oleh Pemilik)</span>
           </div>
         )}
       </div>

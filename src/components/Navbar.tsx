@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   X,
+  Crown,
   Sparkles,
 } from 'lucide-react';
 
@@ -18,6 +19,7 @@ interface NavbarProps {
   activeTab: ActiveTab;
   onSelectTab: (tab: ActiveTab) => void;
   onLogout: () => void;
+  onOpenLogin: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -25,20 +27,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   onSelectTab,
   onLogout,
+  onOpenLogin,
 }) => {
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
 
-  // Desktop navigation items
-  const navItems: { id: ActiveTab; label: string; icon: React.ReactNode; ownerOnly?: boolean }[] = [
+  // Desktop navigation items - All 6 tabs visible to both Pemilik and Pengunjung
+  const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
     { id: 'beranda', label: 'Beranda', icon: <Home className="w-4 h-4" /> },
     { id: 'uang_kas', label: 'Uang Kas', icon: <Coins className="w-4 h-4" /> },
     { id: 'kenali_kami', label: 'Kenali Kami', icon: <Users className="w-4 h-4" /> },
     { id: 'rencana_jadwal', label: 'Rencana Jadwal', icon: <Calendar className="w-4 h-4" /> },
     { id: 'riwayat_kas', label: 'Riwayat Kas', icon: <History className="w-4 h-4" /> },
-    { id: 'kelola_data', label: 'Kelola Data', icon: <Settings className="w-4 h-4" />, ownerOnly: true },
+    { id: 'kelola_data', label: role === 'owner' ? 'Kelola Data' : 'Pusat Data', icon: <Settings className="w-4 h-4" /> },
   ];
-
-  const visibleItems = navItems.filter((item) => !item.ownerOnly || role === 'owner');
 
   const handleNavClick = (tab: ActiveTab) => {
     onSelectTab(tab);
@@ -72,9 +73,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop Navigation Links (All 6 tabs visible) */}
             <nav className="hidden lg:flex items-center gap-1.5">
-              {visibleItems.map((item) => {
+              {navItems.map((item) => {
                 const isActive = activeTab === item.id;
                 return (
                   <button
@@ -94,35 +95,50 @@ export const Navbar: React.FC<NavbarProps> = ({
               })}
             </nav>
 
-            {/* Role Badge & Logout button */}
+            {/* Role Badge & Actions */}
             <div className="flex items-center gap-2 sm:gap-3">
               {role === 'owner' ? (
-                <span
-                  id="badge-role-owner"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-[#e1eee5] text-[#1b4332] border border-[#bed8c7]"
-                >
-                  <span>👑</span>
-                  <span>Pemilik</span>
-                </span>
-              ) : (
-                <span
-                  id="badge-role-visitor"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-[#eeeae0] text-[#3d5a45] border border-[#d6cfbe]"
-                >
-                  <span>👤</span>
-                  <span>Pengunjung</span>
-                </span>
-              )}
+                <>
+                  <span
+                    id="badge-role-owner"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-[#e1eee5] text-[#1b4332] border border-[#bed8c7]"
+                  >
+                    <span>👑</span>
+                    <span>Pemilik</span>
+                  </span>
 
-              <button
-                id="btn-nav-logout"
-                onClick={onLogout}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#8a3333] hover:bg-[#fbebeb] border border-[#e8c6c6] transition-colors cursor-pointer"
-                title="Keluar"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Keluar</span>
-              </button>
+                  <button
+                    id="btn-nav-logout"
+                    onClick={onLogout}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#8a3333] hover:bg-[#fbebeb] border border-[#e8c6c6] transition-colors cursor-pointer"
+                    title="Keluar"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Keluar</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span
+                    id="badge-role-visitor"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-[#eeeae0] text-[#3d5a45] border border-[#d6cfbe]"
+                    title="Mode Transparansi: Akses Penuh Melihat Data"
+                  >
+                    <span>👤</span>
+                    <span>Pengunjung</span>
+                  </span>
+
+                  <button
+                    id="btn-nav-open-login"
+                    onClick={onOpenLogin}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#1b4332] bg-[#e4efe8] hover:bg-[#d5e7dc] border border-[#bed8c7] shadow-2xs transition-all cursor-pointer"
+                    title="Masuk sebagai Pemilik (bau)"
+                  >
+                    <Crown className="w-3.5 h-3.5 text-[#2d6a4f]" />
+                    <span>Login Pemilik</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -255,37 +271,52 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-xs text-[#84a98c]">Buka</span>
               </button>
 
-              {/* Kelola Data (Khusus Pemilik) */}
-              {role === 'owner' && (
-                <button
-                  type="button"
-                  onClick={() => handleNavClick('kelola_data')}
-                  className={`w-full min-h-[46px] flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
-                    activeTab === 'kelola_data'
-                      ? 'bg-[#1b4332] text-white'
-                      : 'bg-[#e4efe8] text-[#1b4332] hover:bg-[#d5e7dc]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Settings className="w-4 h-4" />
-                    <span>⚙️ Kelola Data (Pemilik)</span>
-                  </div>
-                  <span className="text-xs text-[#2d6a4f] font-bold">👑 Hub</span>
-                </button>
-              )}
-
-              {/* Logout Button */}
+              {/* Pusat Data / Kelola Data (Available for all) */}
               <button
                 type="button"
-                onClick={() => {
-                  setMobileMoreOpen(false);
-                  onLogout();
-                }}
-                className="w-full min-h-[46px] flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-[#8a3333] bg-[#fbebeb] hover:bg-[#f6d7d7] border border-[#e8c6c6] transition-colors mt-2"
+                id="mobile-drawer-kelola-data"
+                onClick={() => handleNavClick('kelola_data')}
+                className={`w-full min-h-[46px] flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                  activeTab === 'kelola_data'
+                    ? 'bg-[#1b4332] text-white'
+                    : 'bg-[#e4efe8] text-[#1b4332] hover:bg-[#d5e7dc]'
+                }`}
               >
-                <LogOut className="w-4 h-4" />
-                <span>🚪 Keluar dari Aplikasi</span>
+                <div className="flex items-center gap-2.5">
+                  <Settings className="w-4 h-4" />
+                  <span>{role === 'owner' ? '⚙️ Kelola Data (Pemilik)' : '⚙️ Pusat Data & Transparansi'}</span>
+                </div>
+                <span className="text-xs text-[#2d6a4f] font-bold">{role === 'owner' ? '👑 Hub' : '👁️ Lihat'}</span>
               </button>
+
+              {/* Action Button: Login for Visitor or Logout for Owner */}
+              {role === 'visitor' ? (
+                <button
+                  type="button"
+                  id="mobile-drawer-btn-login"
+                  onClick={() => {
+                    setMobileMoreOpen(false);
+                    onOpenLogin();
+                  }}
+                  className="w-full min-h-[46px] flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-[#1b4332] bg-[#e4efe8] hover:bg-[#d5e7dc] border border-[#bed8c7] transition-colors mt-2 cursor-pointer shadow-2xs"
+                >
+                  <Crown className="w-4 h-4 text-[#2d6a4f]" />
+                  <span>👑 Masuk Akun Pemilik (bau)</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  id="mobile-drawer-btn-logout"
+                  onClick={() => {
+                    setMobileMoreOpen(false);
+                    onLogout();
+                  }}
+                  className="w-full min-h-[46px] flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-[#8a3333] bg-[#fbebeb] hover:bg-[#f6d7d7] border border-[#e8c6c6] transition-colors mt-2 cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>🚪 Keluar dari Akun Pemilik</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

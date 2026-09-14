@@ -83,7 +83,7 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
     message: 'Login berhasil.',
     token,
     role: 'owner',
-    user: { username: 'dika', role: 'owner' },
+    user: { username: 'bau', role: 'owner' },
   });
 });
 

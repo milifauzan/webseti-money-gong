@@ -7,6 +7,7 @@ import {
   Users,
   Calendar,
   History,
+  Settings,
   ArrowRight,
   TrendingUp,
   TrendingDown,
@@ -81,7 +82,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className="min-h-[44px] inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-[#f7f5ed] text-[#1b4332] hover:bg-[#eae6d8] active:scale-[0.98] font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
             >
               <Coins className="w-4 h-4 text-[#2d6a4f]" />
-              <span>💰 Lihat Uang Kas</span>
+              <span>💰 Uang Kas</span>
             </button>
 
             <button
@@ -103,6 +104,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <Calendar className="w-4 h-4 text-[#98c5a4]" />
               <span>📅 Jadwal</span>
             </button>
+
+            <button
+              id="btn-quick-riwayat-kas"
+              type="button"
+              onClick={() => onNavigate('riwayat_kas')}
+              className="min-h-[44px] inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-[#285741] hover:bg-[#346a50] text-[#f7f5ed] font-bold text-xs sm:text-sm border border-[#3e785c] active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <History className="w-4 h-4 text-[#98c5a4]" />
+              <span>📊 Riwayat Kas</span>
+            </button>
+
+            <button
+              id="btn-quick-pusat-data"
+              type="button"
+              onClick={() => onNavigate('kelola_data')}
+              className="min-h-[44px] inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-[#285741] hover:bg-[#346a50] text-[#f7f5ed] font-bold text-xs sm:text-sm border border-[#3e785c] active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <Settings className="w-4 h-4 text-[#98c5a4]" />
+              <span>⚙️ Pusat Data</span>
+            </button>
           </div>
         </div>
 
@@ -111,6 +132,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           MG
         </div>
       </section>
+
+      {/* Visitor Transparency Notification Banner */}
+      {role === 'visitor' && (
+        <section
+          id="banner-visitor-transparency"
+          className="bg-[#f0f7f3] border border-[#bed8c7] rounded-2xl p-4 sm:p-5 shadow-2xs flex items-start gap-3.5"
+        >
+          <div className="w-10 h-10 rounded-xl bg-[#d5e7dc] text-[#1b4332] flex items-center justify-center shrink-0 text-lg font-bold border border-[#bed8c7]">
+            👁️
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-bold text-[#1b4332] font-serif flex items-center gap-2">
+              <span>Mode Transparansi Terbuka untuk Pengunjung</span>
+              <span className="text-[10px] font-extrabold bg-[#1b4332] text-[#f7f5ed] px-2 py-0.5 rounded-full">
+                HANYA LIHAT
+              </span>
+            </h4>
+            <p className="text-xs text-[#364f3d] mt-1 leading-relaxed">
+              Anda dapat melihat seluruh rincian kas, riwayat keluar-masuk dana, profil anggota, agenda kegiatan, dan status database persisten. Penambahan data dikunci khusus untuk akun Pemilik.
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* 2. QUOTES HARI INI CARD (Section 6, 7, 8, 9) */}
       <section

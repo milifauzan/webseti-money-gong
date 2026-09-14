@@ -132,8 +132,12 @@ export const CashHistoryView: React.FC<CashHistoryViewProps> = ({
         </div>
 
         {role === 'visitor' && (
-          <div className="text-xs font-semibold text-[#3d5a45] bg-[#eeeae0] px-3 py-1.5 rounded-full border border-[#ded7c5] self-start sm:self-center">
-            Mode Transparansi Publik
+          <div
+            id="badge-transparansi-riwayat-pengunjung"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#3d5a45] bg-[#eeeae0] px-3.5 py-2 rounded-xl border border-[#ded7c5] self-start sm:self-center shadow-2xs"
+          >
+            <span>👁️</span>
+            <span>Mode Transparansi Publik (Read-Only)</span>
           </div>
         )}
       </div>

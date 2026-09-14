@@ -167,11 +167,11 @@ const INITIAL_SCHEDULES: Schedule[] = [
 
 function getInitialDb(): DatabaseSchema {
   const salt = crypto.randomBytes(16).toString('hex');
-  const passwordHash = hashPassword('amanah', salt);
+  const passwordHash = hashPassword('2026', salt);
 
   return {
     owner: {
-      username: 'dika',
+      username: 'bau',
       passwordHash,
       salt,
     },
@@ -206,6 +206,21 @@ class Database {
         if (!parsed.sessions) {
           parsed.sessions = {};
         }
+
+        // Ensure owner credentials are set to username 'bau' and password '2026'
+        const cleanExistingUser = (parsed.owner?.username || '').trim().toLowerCase();
+        const existingSalt = parsed.owner?.salt || crypto.randomBytes(16).toString('hex');
+        const expectedHash = hashPassword('2026', existingSalt);
+
+        if (cleanExistingUser !== 'bau' || parsed.owner?.passwordHash !== expectedHash) {
+          parsed.owner = {
+            username: 'bau',
+            salt: existingSalt,
+            passwordHash: expectedHash,
+          };
+          this.saveImmediate(parsed);
+        }
+
         return parsed;
       } catch (err) {
         console.error('Error reading db.json, initializing fresh database:', err);
@@ -227,17 +242,42 @@ class Database {
   }
 
   // --- AUTH ---
-  public verifyOwner(username: string, password: string):boolean {
-    if (username !== this.data.owner.username) return false;
-    const computed = hashPassword(password, this.data.owner.salt);
-    return computed === this.data.owner.passwordHash;
+  public verifyOwner(username: string, password: string): boolean {
+    if (!username || !password) return false;
+    const cleanUser = String(username).trim().toLowerCase();
+    const targetUser = (this.data.owner?.username || 'bau').trim().toLowerCase();
+    if (cleanUser !== targetUser) return false;
+
+    const cleanPass = String(password).trim();
+
+    // Check with stored salt & hash
+    if (this.data.owner?.salt && this.data.owner?.passwordHash) {
+      const computed = hashPassword(cleanPass, this.data.owner.salt);
+      if (computed === this.data.owner.passwordHash) {
+        return true;
+      }
+    }
+
+    // Direct fallback for '2026' with auto-repair
+    if (cleanPass === '2026') {
+      const salt = crypto.randomBytes(16).toString('hex');
+      this.data.owner = {
+        username: 'bau',
+        salt,
+        passwordHash: hashPassword('2026', salt),
+      };
+      this.save();
+      return true;
+    }
+
+    return false;
   }
 
   public createSession(username: string): string {
     const token = crypto.randomBytes(32).toString('hex');
-    // Valid for 7 days
-    const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
-    this.data.sessions[token] = { username, expiresAt };
+    // Valid for 30 days so owner stays logged in comfortably across multiple devices
+    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+    this.data.sessions[token] = { username: username.trim(), expiresAt };
     this.save();
     return token;
   }

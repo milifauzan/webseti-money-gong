@@ -273,6 +273,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   placeholder="Masukkan username"
                   className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#cbd5cb] bg-white text-[#1b2b20] focus:outline-hidden focus:border-[#1b4332] focus:ring-2 focus:ring-[#1b4332]/20 text-sm font-medium"
                   autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   autoFocus
                 />
               </div>
@@ -290,6 +293,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     placeholder="Masukkan password"
                     className="w-full min-h-[44px] pl-3.5 pr-12 py-2.5 rounded-xl border border-[#cbd5cb] bg-white text-[#1b2b20] focus:outline-hidden focus:border-[#1b4332] focus:ring-2 focus:ring-[#1b4332]/20 text-sm font-medium"
                     autoComplete="current-password"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                   />
                   {/* Icon toggle visibility 👁️ / 🙈 */}
                   <button
