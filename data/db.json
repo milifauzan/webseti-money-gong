@@ -1,8 +1,8 @@
 {
   "owner": {
     "username": "bau",
-    "passwordHash": "3fb3e3c849108c44e3713d0441d9bfa6482eead2738d93e83e0fc5e93b8901140554d51267bb9661b0f684b627c049071a41ab245a37cef9588f14f614cab7a6",
-    "salt": "84c55f2414b282391c254fdbadd8d344"
+    "passwordHash": "$2b$10$miyzSYO4Y3J4kt7gVdxG/eLG23vxCrAE3d7Ik3RR6qRY2/Hy7VBVu",
+    "role": "owner"
   },
   "sessions": {
     "f931a58269ed36e0fa0e9cdc8b64c518f160ceca06f3690b13cf7f2c6a0dc2b7": {
@@ -29,10 +29,6 @@
       "username": "dika",
       "expiresAt": 1789973678681
     },
-    "ec36d6261fbf678cdde19001cb73efb26e2f9a8cf30b2bd16eb7a664525d59e2": {
-      "username": "dika",
-      "expiresAt": 1789974877852
-    },
     "89112281f6f50fc438d42b2f9ed58d3b2e603466fc70cb015682247d0e3cc8b4": {
       "username": "bau",
       "expiresAt": 1791962267491
@@ -40,6 +36,14 @@
     "78e484e02a359074332903dea2d80cf8115a08139e67a4aefdc384f6f240dc15": {
       "username": "Bau",
       "expiresAt": 1791962267516
+    },
+    "a6c3b04bf7d69b76b26c3e853cf834148089afb8f86267861fdcda3a071c4c6b": {
+      "username": "bau",
+      "expiresAt": 1791963723482
+    },
+    "a7b8f42552e97c2cb45ebac3eb4aaf870eaeba35074c1d5d9d5e27aa63ddbca8": {
+      "username": "bau",
+      "expiresAt": 1791963732590
     }
   },
   "cash_transactions": [

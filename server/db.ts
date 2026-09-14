@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 
 export interface CashTransaction {
   id: string;
@@ -39,7 +40,8 @@ export interface DatabaseSchema {
   owner: {
     username: string;
     passwordHash: string;
-    salt: string;
+    salt?: string;
+    role?: string;
   };
   sessions: { [token: string]: { username: string; expiresAt: number } };
   cash_transactions: CashTransaction[];
@@ -167,13 +169,14 @@ const INITIAL_SCHEDULES: Schedule[] = [
 
 function getInitialDb(): DatabaseSchema {
   const salt = crypto.randomBytes(16).toString('hex');
-  const passwordHash = hashPassword('2026', salt);
+  const passwordHash = bcrypt.hashSync('2026', 10);
 
   return {
     owner: {
       username: 'bau',
       passwordHash,
       salt,
+      role: 'owner',
     },
     sessions: {},
     cash_transactions: [],
@@ -207,16 +210,17 @@ class Database {
           parsed.sessions = {};
         }
 
-        // Ensure owner credentials are set to username 'bau' and password '2026'
+        // Ensure owner credentials are set to username 'bau' and bcrypt password hash for '2026'
         const cleanExistingUser = (parsed.owner?.username || '').trim().toLowerCase();
-        const existingSalt = parsed.owner?.salt || crypto.randomBytes(16).toString('hex');
-        const expectedHash = hashPassword('2026', existingSalt);
+        const isBcrypt =
+          parsed.owner?.passwordHash &&
+          (parsed.owner.passwordHash.startsWith('$2a$') || parsed.owner.passwordHash.startsWith('$2b$'));
 
-        if (cleanExistingUser !== 'bau' || parsed.owner?.passwordHash !== expectedHash) {
+        if (cleanExistingUser !== 'bau' || !isBcrypt) {
           parsed.owner = {
             username: 'bau',
-            salt: existingSalt,
-            passwordHash: expectedHash,
+            passwordHash: bcrypt.hashSync('2026', 10),
+            role: 'owner',
           };
           this.saveImmediate(parsed);
         }
@@ -242,35 +246,63 @@ class Database {
   }
 
   // --- AUTH ---
-  public verifyOwner(username: string, password: string): boolean {
-    if (!username || !password) return false;
+  /**
+   * 1. Mencari pengguna berdasarkan username di database
+   */
+  public async findUserByUsername(username: string): Promise<{ username: string; passwordHash: string; role: string } | null> {
+    if (!username) return null;
     const cleanUser = String(username).trim().toLowerCase();
-    const targetUser = (this.data.owner?.username || 'bau').trim().toLowerCase();
-    if (cleanUser !== targetUser) return false;
+    const ownerUser = (this.data.owner?.username || 'bau').trim().toLowerCase();
 
-    const cleanPass = String(password).trim();
+    if (cleanUser === ownerUser) {
+      return {
+        username: this.data.owner.username,
+        passwordHash: this.data.owner.passwordHash,
+        role: this.data.owner.role || 'owner',
+      };
+    }
+    return null;
+  }
 
-    // Check with stored salt & hash
-    if (this.data.owner?.salt && this.data.owner?.passwordHash) {
-      const computed = hashPassword(cleanPass, this.data.owner.salt);
-      if (computed === this.data.owner.passwordHash) {
+  /**
+   * 2. Melakukan pengecekan password menggunakan bcrypt.compare()
+   */
+  public async verifyPassword(plainPassword: string, storedHash: string): Promise<boolean> {
+    if (!plainPassword || !storedHash) return false;
+
+    try {
+      // Bandingkan password plain dengan hash bcrypt
+      const isMatch = await bcrypt.compare(plainPassword, storedHash);
+      if (isMatch) return true;
+    } catch (err) {
+      // Jika hash bukan format bcrypt (misal legacy PBKDF2)
+    }
+
+    // Fallback: cek format PBKDF2 legacy bila ada salt
+    if (this.data.owner?.salt) {
+      const computed = hashPassword(plainPassword, this.data.owner.salt);
+      if (computed === storedHash) {
+        // Upgrade otomatis ke bcrypt hash
+        this.data.owner.passwordHash = bcrypt.hashSync(plainPassword, 10);
+        this.save();
         return true;
       }
     }
 
-    // Direct fallback for '2026' with auto-repair
-    if (cleanPass === '2026') {
-      const salt = crypto.randomBytes(16).toString('hex');
-      this.data.owner = {
-        username: 'bau',
-        salt,
-        passwordHash: hashPassword('2026', salt),
-      };
+    // Fallback jika password asli adalah '2026'
+    if (plainPassword.trim() === '2026') {
+      this.data.owner.passwordHash = bcrypt.hashSync('2026', 10);
       this.save();
       return true;
     }
 
     return false;
+  }
+
+  public async verifyOwner(username: string, password: string): Promise<boolean> {
+    const user = await this.findUserByUsername(username);
+    if (!user) return false;
+    return await this.verifyPassword(password, user.passwordHash);
   }
 
   public createSession(username: string): string {

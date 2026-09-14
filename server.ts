@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
+import bcrypt from 'bcryptjs';
 import { createServer as createViteServer } from 'vite';
 import { db, UPLOADS_DIR } from './server/db.js';
 
@@ -64,27 +65,74 @@ function requireOwner(req: Request, res: Response, next: NextFunction): void {
 // 1. AUTHENTICATION API
 // ----------------------------------------------------
 
-app.post('/api/auth/login', (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    res.status(400).json({ success: false, message: 'Username dan password wajib diisi.' });
-    return;
-  }
+app.post('/api/auth/login', async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
 
-  const isValid = db.verifyOwner(String(username).trim(), String(password).trim());
-  if (!isValid) {
-    res.status(401).json({ success: false, message: 'Username atau password salah.' });
-    return;
-  }
+    // Validasi kelengkapan input
+    if (!username || !password) {
+      res.status(400).json({
+        success: false,
+        message: 'Username dan password wajib diisi.',
+      });
+      return;
+    }
 
-  const token = db.createSession(username);
-  res.json({
-    success: true,
-    message: 'Login berhasil.',
-    token,
-    role: 'owner',
-    user: { username: 'bau', role: 'owner' },
-  });
+    const cleanUsername = String(username).trim();
+    const cleanPassword = String(password).trim();
+
+    // 1. Mencari pengguna berdasarkan username di database
+    const user = await db.findUserByUsername(cleanUsername);
+    if (!user) {
+      // Kondisi jika username tidak ditemukan
+      res.status(401).json({
+        success: false,
+        message: 'Username atau password salah.',
+      });
+      return;
+    }
+
+    // 2. Melakukan pengecekan password menggunakan bcrypt.compare()
+    let isPasswordMatch = false;
+    try {
+      isPasswordMatch = await bcrypt.compare(cleanPassword, user.passwordHash);
+    } catch (err) {
+      console.warn('Bcrypt compare direct error, fallback check initiated');
+    }
+
+    // Dukungan fallback verifikasi otomatis
+    if (!isPasswordMatch) {
+      isPasswordMatch = await db.verifyPassword(cleanPassword, user.passwordHash);
+    }
+
+    // 3. Menangani kondisi jika password tidak cocok
+    if (!isPasswordMatch) {
+      res.status(401).json({
+        success: false,
+        message: 'Username atau password salah.',
+      });
+      return;
+    }
+
+    // Jika username dan password benar: Buat session token
+    const token = db.createSession(user.username);
+    res.json({
+      success: true,
+      message: 'Login berhasil.',
+      token,
+      role: 'owner',
+      user: {
+        username: user.username,
+        role: user.role,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error saat proses autentikasi login:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server saat autentikasi.',
+    });
+  }
 });
 
 app.post('/api/auth/verify', (req: Request, res: Response) => {
