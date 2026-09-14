@@ -1,0 +1,6 @@
+{
+  "name": "Money Gong",
+  "description": "Kelola Kas, Kenali Kami, dan Rencanakan Kegiatan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

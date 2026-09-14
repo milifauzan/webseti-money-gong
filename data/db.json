@@ -1,0 +1,153 @@
+{
+  "owner": {
+    "username": "dika",
+    "passwordHash": "55c59a08a025210b510f5f8fa785684221a4a3adfe94a426a9cf0c7cabfcab80133b3281833fe3e9490acdd836ba315f82d1a2f1e582bc5d79c1ca605e891da9",
+    "salt": "84c55f2414b282391c254fdbadd8d344"
+  },
+  "sessions": {
+    "f931a58269ed36e0fa0e9cdc8b64c518f160ceca06f3690b13cf7f2c6a0dc2b7": {
+      "username": "dika",
+      "expiresAt": 1789973660498
+    },
+    "8ca019676e6ad7e7630e91a80c12036e9ac60476c20917089d4a4085329fd01e": {
+      "username": "dika",
+      "expiresAt": 1789973665083
+    },
+    "842163af96db8627cee0b791d14746c0b0ce0359b350b6c88b93a4526096e37a": {
+      "username": "dika",
+      "expiresAt": 1789973667462
+    },
+    "c41b26b4000eccb14250adc0a4337e08f04f1e4c0d105937ff12dbc6ef62672d": {
+      "username": "dika",
+      "expiresAt": 1789973670603
+    },
+    "babfa7a601e4fd979e9677545595f79b3bfb9c0339248c4a6f15e720bd57fd54": {
+      "username": "dika",
+      "expiresAt": 1789973673044
+    },
+    "c9d0c5c1ad63bc3774b2386d72e08232981e6d040604560f8d0ee2bac82cdc3e": {
+      "username": "dika",
+      "expiresAt": 1789973678681
+    }
+  },
+  "cash_transactions": [
+    {
+      "id": "tx-1789368865101-5245b5",
+      "type": "income",
+      "amount": 50000,
+      "transaction_date": "2026-09-14",
+      "description": "Iuran kas mingguan anggota",
+      "balance_after": 50000,
+      "created_at": "2026-09-14T06:54:25.101Z",
+      "updated_at": "2026-09-14T06:54:25.101Z"
+    },
+    {
+      "id": "tx-1789368867479-52bbb3",
+      "type": "expense",
+      "amount": 25000,
+      "transaction_date": "2026-09-15",
+      "description": "Membeli makanan untuk kegiatan kelompok",
+      "balance_after": 25000,
+      "created_at": "2026-09-14T06:54:27.479Z",
+      "updated_at": "2026-09-14T06:54:27.479Z"
+    }
+  ],
+  "members": [
+    {
+      "id": "member-1",
+      "name": "Den Bau",
+      "position": "Ketua",
+      "description": "Ketua kelompok Money Gong yang bertanggung jawab memimpin koordinasi dan keterbukaan kas.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-14T06:54:38.698Z"
+    },
+    {
+      "id": "member-2",
+      "name": "Dika Bau",
+      "position": "Anggota",
+      "description": "Anggota aktif pengelola keuangan kas dan administrasi kelompok.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "member-3",
+      "name": "Mi Bau",
+      "position": "Anggota",
+      "description": "Anggota pendukung perencanaan kegiatan dan operasional.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "member-4",
+      "name": "Gen Bau",
+      "position": "Anggota",
+      "description": "Anggota divisi perlengkapan dan logistik acara kelompok.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "member-5",
+      "name": "Fid Bau",
+      "position": "Anggota",
+      "description": "Anggota dokumentasi dan pengawasan kegiatan.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "member-6",
+      "name": "Ras Bau",
+      "position": "Anggota",
+      "description": "Anggota pendukung komunikasi dan hubungan antar anggota.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "member-7",
+      "name": "Raf Bau",
+      "position": "Anggota",
+      "description": "Anggota operasional dan pendamping kegiatan lapangan.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "member-8",
+      "name": "Apr Bau",
+      "position": "Anggota",
+      "description": "Anggota perencana konsumsi dan rekreasi kelompok.",
+      "photo_url": null,
+      "created_at": "2026-09-01T08:00:00.000Z",
+      "updated_at": "2026-09-01T08:00:00.000Z"
+    }
+  ],
+  "schedules": [
+    {
+      "id": "sch-1",
+      "title": "Rapat Kelompok",
+      "date": "2026-09-20",
+      "time": "15:00",
+      "location": "Rumah Dika",
+      "description": "Membahas rencana kegiatan kelompok dan evaluasi kas bulanan.",
+      "status": "Direncanakan",
+      "created_at": "2026-09-10T10:00:00.000Z",
+      "updated_at": "2026-09-10T10:00:00.000Z"
+    },
+    {
+      "id": "sch-2",
+      "title": "Kerja Bakti & Olahraga Bersama",
+      "date": "2026-09-27",
+      "time": "07:30",
+      "location": "Lapangan Komunitas",
+      "description": "Kegiatan kebersamaan anggota kelompok untuk mempererat silaturahmi.",
+      "status": "Direncanakan",
+      "created_at": "2026-09-11T09:00:00.000Z",
+      "updated_at": "2026-09-11T09:00:00.000Z"
+    }
+  ]
+}
