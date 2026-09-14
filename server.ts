@@ -1,10 +1,10 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
 import bcrypt from 'bcryptjs';
-import { createServer as createViteServer } from 'vite';
-import { db, UPLOADS_DIR } from './server/db.js';
+import { db, UPLOADS_DIR } from './server/db.ts';
 
 const app = express();
 const PORT = 3000;
@@ -549,14 +549,20 @@ app.delete('/api/schedules/:id', requireOwner, (req: Request, res: Response) => 
 // ----------------------------------------------------
 
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  const isDev = process.env.NODE_ENV === 'development';
+  if (isDev) {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const distPath = fs.existsSync(path.join(process.cwd(), 'dist', 'index.html'))
+      ? path.join(process.cwd(), 'dist')
+      : (typeof __dirname !== 'undefined' && fs.existsSync(path.join(__dirname, 'index.html'))
+          ? __dirname
+          : path.join(process.cwd(), 'dist'));
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
